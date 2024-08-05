@@ -602,6 +602,8 @@ self: super: with self; {
 
   anitopy = callPackage ../development/python-modules/anitopy { };
 
+  anndata = callPackage ../development/python-modules/anndata { };
+
   annexremote = callPackage ../development/python-modules/annexremote { };
 
   annotated-types = callPackage ../development/python-modules/annotated-types { };
