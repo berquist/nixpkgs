@@ -12,6 +12,8 @@
   natsort,
   packaging,
   array-api-compat,
+  config,
+  cudaSupport ? config.cudaSupport,
   cupy,
   pytest-xdist,
   # loompy,
@@ -56,7 +58,7 @@ buildPythonPackage rec {
     array-api-compat
   ];
 
-  optional-dependencies = [ cupy ];
+  optional-dependencies = [ ] ++ lib.optionals cudaSupport [ cupy ];
 
   nativeCheckInputs = [
     pytestCheckHook
@@ -73,10 +75,37 @@ buildPythonPackage rec {
     pyarrow
     numba
     pytest-mock
-  ];
+  ] ++ lib.optionals cudaSupport [ cupy ];
 
   pythonImportsCheck = [ "array_api_compat" ];
-  pytestFlagsArray = [ "-v" ];
+
+  disabledTests = [
+    "anndata._core.anndata.AnnData.concatenate"
+    "anndata._core.anndata.AnnData.obs_names_make_unique"
+    "anndata._core.anndata.AnnData.var_names_make_unique"
+    "anndata._core.merge.concat"
+    "anndata._core.merge.gen_reindexer"
+    "anndata._core.sparse_dataset.sparse_dataset"
+    "anndata._io.utils.report_read_key_on_error"
+    "anndata._io.utils.report_write_key_on_error"
+    "anndata._warnings.ImplicitModificationWarning"
+    "anndata.experimental.merge.concat_on_disk"
+    "anndata.experimental.multi_files._anncollection.AnnCollection"
+    "anndata.utils.make_index_unique"
+    "concatenation.rst"
+  ];
+
+  # CUDA (used via cupy) is not available in the testing sandbox
+  #
+  # Only doctests import scanpy, which itself depends on this package, so
+  # don't run the few doctests to avoid circular build errors.
+  # checkPhase = ''
+  #   runHook preCheck
+  #   # python -m pytest -v -k "not cupy" --strict-markers --pyargs -ptesting.anndata._pytest
+  #   python -m pytest -v
+  #   runHook postCheck
+  # '';
+
 
   passthru.updateScript = nix-update-script { };
 
