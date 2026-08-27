@@ -24,6 +24,7 @@
 
   # tests
   pytestCheckHook,
+  pytest-xdist,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -74,6 +75,7 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [
     pytestCheckHook
+    pytest-xdist
   ]
   ++ finalAttrs.passthru.optional-dependencies.cppe;
   pythonImportsCheck = [ "pyscf" ];
